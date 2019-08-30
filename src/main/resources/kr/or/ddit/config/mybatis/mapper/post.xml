@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="post">
+
+   <select id = "selectAll" resultType = "post">
+  	select * from bulletin
+  	order by 1
+   </select>
+  
+  <select id = "getPost" resultType="post" parameterType="post">
+  	select *
+  	from bulletin
+  	where bullNo = #{bullNo}
+  	 and boardNo = #{boardNo}
+  </select>
+  
+
+ <resultMap type="kr.or.ddit.post.model.Post" id="level">
+ 	
+ 	<result column="BULLNO" property="bullNo"/>
+ 	
+ 	<result column="PARENTNO" property="parentNo"/>
+ 	
+ 	<result column="BULLTITLE" property="bullTitle"/>
+ 	
+ 	<result column="USERID" property="userId"/>
+ 	
+ 	<result column="REG_DT" property="reg_dt"/>
+ 	
+ 	<result column="level" property="level"/>
+ </resultMap>
+
+  <select id="getPostPagingList" resultType="post" parameterType="page">
+		select a.*
+		from 
+		(select rownum rn, a.*
+		 from
+		    (select bullNo, parentNo, lpad(' ', (level-1)*4, ' ') || bullTitle bullTitle, userId, reg_dt, level 
+		      from BULLETIN a
+		      where boardNo = #{boardSeq}  
+		     start with parentNo is null
+		     connect by prior bullNo = parentNo
+		     order SIBLINGS by gn desc, bullNo) a) a
+		where rn between (#{page}-1)*#{pagesize}+1 and #{page}*#{pagesize}
+  </select>
+  
+  <!-- 사용자 전체 건수 조회 -->
+  <select id="getPostTotalCnt" resultType="Integer">
+  	select count(*)
+  	 from bulletin
+  </select>
+  
+  <select id="getPostLevel" resultType="post">
+	select BULLNO, PARENTNO, lpad(' ', (level-1)*4, ' ') || BULLTITLE BULLTITLE, USERID, REG_DT, level
+	 from BULLETIN
+	start with PARENTNO is null
+	connect by prior BULLNO = PARENTNO
+	order SIBLINGS by gn desc, BULLNO
+  </select>
+  
+  
+  <insert id="insertPost">
+  	insert into 
+  	
+  </insert>
+  
+
+
+
+</mapper>
