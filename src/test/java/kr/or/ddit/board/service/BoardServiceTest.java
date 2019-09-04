@@ -47,7 +47,7 @@ public class BoardServiceTest {
 		List<Board> list = boardService.selectAll();
 		
 		/***Then***/
-		assertEquals(3, list.size());
+		assertEquals(4, list.size());
 		
 	}
 	
@@ -73,7 +73,7 @@ public class BoardServiceTest {
 	@Test
 	public void getBoardTest() {
 		/***Given***/
-		int seq = 1;
+		int seq = 53;
 		
 		/***When***/
 		Board board = boardService.getBoard(seq);

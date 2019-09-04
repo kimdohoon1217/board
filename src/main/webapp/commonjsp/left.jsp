@@ -20,17 +20,7 @@
 		<c:forEach items="${list }" var="board" varStatus="status">
 			<c:choose>
 				<c:when test="${board.useStatus == '사용' }">
-					<%-- <c:choose>
-						<c:when test="${status.count == 1 }">
-							<li class="active"><a href="${cp }/freeBoard">${board.boardNm }<span class="sr-only">(current)</span></a></li>
-						</c:when>
-						<c:when test="${status.count == 2 }">
-							<li class="active"><a href="${cp }/QnABoard">${board.boardNm }<span class="sr-only">(current)</span></a></li>
-						</c:when>
-						<c:otherwise> --%>
-							<li class="active"><a href="${cp }/freeBoard?boardSeq=${board.boardNo}">${board.boardNm }<span class="sr-only">(current)</span></a></li>
-					<%-- 	</c:otherwise>
-					</c:choose> --%>
+					<li class="active"><a href="${cp }/freeBoard?boardSeq=${board.boardNo}">${board.boardNm }<span class="sr-only">(current)</span></a></li>
 				</c:when>
 				<c:otherwise>
 					

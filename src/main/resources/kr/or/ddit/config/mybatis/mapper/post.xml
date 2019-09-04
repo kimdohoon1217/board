@@ -17,28 +17,24 @@
   	 and boardNo = #{boardNo}
   </select>
   
-
- <resultMap type="kr.or.ddit.post.model.Post" id="level">
- 	
- 	<result column="BULLNO" property="bullNo"/>
- 	
- 	<result column="PARENTNO" property="parentNo"/>
- 	
- 	<result column="BULLTITLE" property="bullTitle"/>
- 	
- 	<result column="USERID" property="userId"/>
- 	
- 	<result column="REG_DT" property="reg_dt"/>
- 	
- 	<result column="level" property="level"/>
- </resultMap>
-
+  <select id="getFile" resultType="attach" parameterType="int">
+  	select *
+  	from ATTACHMENT
+  	where bullNo = #{bullNo}
+  </select>
+  
+  <select id="getFile2" resultType="attach" parameterType="int">
+  	select *
+  	from ATTACHMENT
+  	where filNo = #{filNo}
+  </select>
+  
   <select id="getPostPagingList" resultType="post" parameterType="page">
 		select a.*
 		from 
 		(select rownum rn, a.*
 		 from
-		    (select bullNo, parentNo, lpad(' ', (level-1)*4, ' ') || bullTitle bullTitle, userId, reg_dt, level 
+		    (select bullNo, parentNo, lpad(' ', (level-1)*4, ' ') || bullTitle bullTitle, userId, reg_dt, level, delStatus 
 		      from BULLETIN a
 		      where boardNo = #{boardSeq}  
 		     start with parentNo is null
@@ -51,6 +47,7 @@
   <select id="getPostTotalCnt" resultType="Integer">
   	select count(*)
   	 from bulletin
+  	 where boardNo = #{boardNo}
   </select>
   
   <select id="getPostLevel" resultType="post">
@@ -62,12 +59,69 @@
   </select>
   
   
-  <insert id="insertPost">
-  	insert into 
-  	
+  <insert id="insertPost" parameterType="post">
+  	<selectKey resultType="int" keyProperty="bullNo" order="BEFORE">
+  		select P_SEQ.NEXTVAL FROM DUAL
+  	</selectKey>
+  	insert into BULLETIN (BULLNO, BOARDNO, BULLTITLE, BULLCONT, USERID, REG_DT, DELSTATUS, PARENTNO, GN)
+  	values(#{bullNo}, #{boardNo}, #{bullTitle, jdbcType=VARCHAR}, #{bullCont, jdbcType=VARCHAR}, #{userId}, sysdate, #{delStatus}, decode(#{parentNo}, 0, null), #{bullNo})
   </insert>
   
-
-
+  <insert id="insertFile" parameterType="attach">
+  	insert into ATTACHMENT (filNo, filePath, uploadFile, bullNo) values(F_SEQ.NEXTVAL, #{filePath, jdbcType=VARCHAR}, #{uploadFile, jdbcType=VARCHAR}, #{bullNo})
+  </insert>
+  
+  <update id="updateDel" parameterType="HashMap">
+  	update BULLETIN set
+  	delStatus = #{delStatus}
+  	where bullNo = #{bullNo}
+  </update>
+  
+  <update id="updatePost" parameterType="post">
+  	update BULLETIN set
+  	 bullTitle = #{bullTitle, jdbcType=VARCHAR},
+  	 bullCont = #{bullCont, jdbcType=VARCHAR},
+  	 reg_dt = sysdate
+  	 where bullNo = #{bullNo}
+  </update>
+  
+  <update id="updateFile" parameterType="attach">
+  	update ATTACHMENT set
+  	filePath = #{filePath},
+  	uploadFile = #{uploadFile}
+  	where bullNo = #{bullNo}
+  </update>
+  
+  <insert id="insertCom" parameterType="map">
+  	insert into reply1 (REPLYNO, REPLYCONT, C_DATE, BULLNO, USERID, DELSTATUS)
+  	values (RE_SEQ.nextVal, #{replyCont}, sysdate, #{bullNo}, #{userId}, #{delStatus})
+  </insert>
+  
+  <insert id="insertReply" parameterType="post">
+	  <selectKey resultType="int" keyProperty="bullNo" order="BEFORE">
+	  		select P_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	insert into BULLETIN (BULLNO, BOARDNO, BULLTITLE, BULLCONT, USERID, REG_DT, DELSTATUS, PARENTNO, GN)
+  	values(#{bullNo}, #{boardNo}, #{bullTitle, jdbcType=VARCHAR}, #{bullCont, jdbcType=VARCHAR}, #{userId}, sysdate, #{delStatus}, #{parentNo}, #{gn})
+  </insert>
+  
+  <delete id="deleteFile" parameterType="int">
+  	delete from ATTACHMENT
+  	where filNo = #{filNo}
+  </delete>
+  
+  <update id="updateCom" parameterType="HashMap">
+  	update REPLY1 set
+  	DELSTATUS = #{delStatus}
+  	where REPLYNO = #{replyNo}
+  </update>
+  
+  <select id="selectCom" parameterType="int" resultType="map">
+  	select REPLYNO, C_DATE, BULLNO, USERID, DELSTATUS, REPLYCONT
+  	from REPLY1
+  	where bullNo = #{bullNo}
+  </select>
+  
+  
 
 </mapper>

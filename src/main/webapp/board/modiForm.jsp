@@ -46,15 +46,17 @@
 
 				// 이부분에 에디터 validation 검증
 				if(validation()) {
-					$("#frm").submit();
+					console.log("아무거나");
+					$("#fffff").submit();
 				}
 			}
 		})
 		
-		$("#regFile").on('change', function(){
+		
+			$("#regFile").on('change', function(){
 			var filesInput = document.getElementById("regFile");
 			var file = filesInput.files;
-			if(file.length > 5){
+			if(file.length > (5-$(".mbtn").length)){
 				alert("5개이상은안됩니다.");
 				$("#regFile").val("");
 			}
@@ -62,6 +64,19 @@
 		});
 		
 		
+		$(".mbtn").click(function(){
+			var idx = $(this).attr("idx");
+			$("#filNo").val(idx);			
+			
+			$("#div"+idx).remove();
+			$("#frmFile"+idx).submit();
+			
+			/* if(idx == $(this).parents('.mdiv').find('.mlabel').attr("idx")){
+				$(this).parents('.mdiv').find('.mlabel').eq(idx).remove();
+				$(this).parents('.mdiv').find('.mbtn').eq(idx).remove();
+				$("#frmFile").submit();
+			} */
+		});
 		
 	});
 	
@@ -92,23 +107,31 @@
 	<%@include file="/commonjsp/left.jsp" %>
 </div><div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-				<form action = "${cp}/postForm" id="frm" method="post" enctype="multipart/form-data">
-					<input type="hidden" name = "boardSeq" value="${boardSeq }"/>
+				<form action = "${cp}/modifyPost" id="fffff" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="mPostNo" value="${vo.bullNo }">
+					<input type="hidden" name="mBoardSeq" value="${vo.boardNo }">
 					<div class="form-group">
 						<label for="postTitle" class="col-sm-2 control-label">제목</label>
 						<div class="col-sm-8">
-							<input type="text" class="form-control" id="pTitle" name="pTitle">
+							<input type="text" class="form-control" id="pTitle" name="pTitle" value="${vo.bullTitle }">
 						</div>
 					</div>
 					<br>
 					<div class="form-group">
 						<label for="postCont" class="col-sm-2 control-label">글내용</label>
-							<textarea name="cont" id="smarteditor" rows="10" cols="100" style="width:700px; height:412px;"></textarea> 
+							<textarea name="cont" id="smarteditor" rows="10" cols="100" style="width:700px; height:412px;">${vo.bullCont }</textarea> 
 					</div>
 					<br>
 					<div class="form-group">
 						<label for="postFile" class="col-sm-2 control-label">첨부파일</label>
-						<div class="col-sm-8">
+						<div class="col-sm-8 mdiv">
+						 <c:forEach items="${fileList }" var="file">
+						 		<div id="div${file.filNo }">
+		                        <label class="mlabel">${file.uploadFile }</label>
+		                        <a href="${cp }/deleteFile?filNo=${file.filNo}&postNo=${vo.bullNo}&boardNo=${vo.boardNo}" idx ="${file.filNo }"  class = "mbtn">X</a>
+		                     </div>
+	                        <br>
+	                    </c:forEach>
 							<input type="file" class="form-control" id="regFile" name="regFile" multiple="multiple">
 						</div>
 					</div>

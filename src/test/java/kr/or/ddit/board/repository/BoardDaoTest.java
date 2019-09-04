@@ -43,7 +43,7 @@ public class BoardDaoTest {
 		/***When***/
 		List<Board> list = boardDao.selectAll(sqlSession);
 		/***Then***/
-		assertEquals(1, list.size());
+		assertEquals(3, list.size());
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class BoardDaoTest {
 	@Test
 	public void getBoardTest() {
 		/***Given***/
-		int seq = 1;
+		int seq = 53;
 		
 		/***When***/
 		Board board = boardDao.getBoard(sqlSession, seq);
@@ -80,7 +80,7 @@ public class BoardDaoTest {
 		Board board = new Board();
 		board.setBoardNm("수정연습");
 		board.setUseStatus("미사용");
-		board.setBoardNo(1);
+		board.setBoardNo(53);
 		
 		
 		/***When***/

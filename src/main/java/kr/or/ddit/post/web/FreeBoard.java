@@ -41,15 +41,14 @@ public class FreeBoard extends HttpServlet {
 		// page , pagesize 파라미터 받기
 		String pageStr = request.getParameter("page");
 		String pagesizeStr = request.getParameter("pagesize");
-		int boardNo = Integer.parseInt(request.getParameter("boardSeq"));
+		String boardNoStr = request.getParameter("boardSeq");
 		
 		int page = pageStr == null ? 1 : Integer.parseInt(pageStr);
 		int pagesize = pagesizeStr == null ? 10 : Integer.parseInt(pagesizeStr);
-		
+		int boardNo =  boardNoStr == null ? 1 : Integer.parseInt(boardNoStr);
 		
 		Page p = new Page(page, pagesize, boardNo);
 		request.setAttribute("pageVo", p);
-		
 		
 		
 		// userService객체를  이용하여 getUserPagingList를 호출

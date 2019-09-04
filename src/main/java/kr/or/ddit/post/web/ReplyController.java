@@ -1,5 +1,6 @@
 package kr.or.ddit.post.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,15 +26,13 @@ import kr.or.ddit.post.service.PostService;
 import kr.or.ddit.user.model.User;
 import kr.or.ddit.util.FileuploadUtil;
 
-/**
- * Servlet implementation class PostFormController
- */
-@WebServlet("/postForm")
+
+@WebServlet("/reply")
 @MultipartConfig(maxFileSize = 1024*1024*5*5, maxRequestSize = 1024*1024*5*5*5)
-public class PostFormController extends HttpServlet {
+public class ReplyController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = LoggerFactory.getLogger(PostFormController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReplyController.class);
        
 	private IPostService postService;
 	
@@ -41,13 +40,19 @@ public class PostFormController extends HttpServlet {
 	public void init() throws ServletException {
 		postService = new PostService();
 	}
+
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 int seq = Integer.parseInt(request.getParameter("boardSeq"));
-		 request.setAttribute("boardSeq", seq);
-		 
+		int postNo = Integer.parseInt(request.getParameter("postNo"));
+		int boardNo = Integer.parseInt(request.getParameter("boardNo"));
 		
-		request.getRequestDispatcher("/board/postForm.jsp").forward(request, response);
+		Post post = new Post();
+		post.setBoardNo(boardNo);
+		post.setBullNo(postNo);
+		
+		Post vo = postService.getPost(post);
+		request.setAttribute("vo", vo);
+		request.getRequestDispatcher("/board/reply.jsp").forward(request, response);
 	}
 
 	/**
@@ -59,26 +64,33 @@ public class PostFormController extends HttpServlet {
 		HttpSession httpSession = request.getSession();
      	User userVo = (User)httpSession.getAttribute("S_USERVO");
      	logger.debug("userid --{}", userVo.getUserId());
+     	if(userVo.getUserId() == null) {
+     		request.getRequestDispatcher("login/login.jsp").forward(request, response);
+     	}
 		
 		String title = request.getParameter("pTitle");
 		String cont = request.getParameter("cont");
 		
-	   int seq = Integer.parseInt(request.getParameter("boardSeq"));
+	   int seq = Integer.parseInt(request.getParameter("boardNo"));
+	   int postNo = Integer.parseInt(request.getParameter("postNo"));
+	   int gn = Integer.parseInt(request.getParameter("gn"));
        logger.debug("seq = {}",seq);
+       
        Post post = new Post();
        post.setBoardNo(seq);
        post.setBullTitle(title);
        post.setBullCont(cont);
        post.setDelStatus("X");
        post.setUserId(userVo.getUserId());
+       post.setParentNo(postNo);
+       post.setGn(gn);
        
-       
-      postService.insertPost(post);
+      postService.insertReply(post);
       
-      int postNo = post.getBullNo();
-      logger.debug("postNo - {}", postNo);
+      int res = post.getBullNo();
+      
 	
-      Collection<Part> files = request.getParts();
+      List<Part> files = (List<Part>) request.getParts();
       logger.debug("files-size : {}", files.size());
       List<Part> pList = new ArrayList<Part>();
         String fileName = "";
@@ -97,15 +109,11 @@ public class PostFormController extends HttpServlet {
                         path = FileuploadUtil.getPath() + realFileName + ext;
 
                         part.write(path);
-
-//                        Map fileMap = new HashMap();
-//                        fileMap.put("UPLOADFILE", fileName);
-//                        fileMap.put("FILEPATH", path);
                         
                         Attach attach = new Attach();
                         attach.setUploadFile(fileName);
                         attach.setFilePath(path);
-                        attach.setBullNo(postNo);
+                        attach.setBullNo(res);
 
                         postService.insertFile(attach);
                     }
@@ -117,7 +125,9 @@ public class PostFormController extends HttpServlet {
             //postNo , boardNo 를 가지고 redirect를 해준다 postController
         }
         //"&filNo=" + filNo 파일넘버도 보내줘야함
-        response.sendRedirect(request.getContextPath() + "/post?boardNo=" + seq + "&postNo=" + postNo);
+        response.sendRedirect(request.getContextPath() + "/post?boardNo=" + seq + "&postNo=" + res);
+		
+		
 	}
 
 }

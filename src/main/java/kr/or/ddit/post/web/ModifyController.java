@@ -26,14 +26,14 @@ import kr.or.ddit.user.model.User;
 import kr.or.ddit.util.FileuploadUtil;
 
 /**
- * Servlet implementation class PostFormController
+ * Servlet implementation class ModifyController
  */
-@WebServlet("/postForm")
+@WebServlet("/modifyPost")
 @MultipartConfig(maxFileSize = 1024*1024*5*5, maxRequestSize = 1024*1024*5*5*5)
-public class PostFormController extends HttpServlet {
+public class ModifyController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = LoggerFactory.getLogger(PostFormController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ModifyController.class);
        
 	private IPostService postService;
 	
@@ -41,13 +41,26 @@ public class PostFormController extends HttpServlet {
 	public void init() throws ServletException {
 		postService = new PostService();
 	}
-	
+   
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 int seq = Integer.parseInt(request.getParameter("boardSeq"));
-		 request.setAttribute("boardSeq", seq);
-		 
+		int postNo = Integer.parseInt(request.getParameter("postNo"));
+		int boardNo = Integer.parseInt(request.getParameter("boardNo"));
 		
-		request.getRequestDispatcher("/board/postForm.jsp").forward(request, response);
+		Post post = new Post();
+		post.setBoardNo(boardNo);
+		post.setBullNo(postNo);
+		
+		Post vo = postService.getPost(post);
+		
+		List<Attach> fileList = postService.getFile(postNo);
+		
+		
+		request.setAttribute("vo", vo);
+		request.setAttribute("fileList", fileList);
+		request.getRequestDispatcher("/board/modiForm.jsp").forward(request, response);
+		
+		
 	}
 
 	/**
@@ -55,30 +68,24 @@ public class PostFormController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		
-		HttpSession httpSession = request.getSession();
-     	User userVo = (User)httpSession.getAttribute("S_USERVO");
-     	logger.debug("userid --{}", userVo.getUserId());
-		
 		String title = request.getParameter("pTitle");
+		logger.debug("{}", title);
 		String cont = request.getParameter("cont");
-		
-	   int seq = Integer.parseInt(request.getParameter("boardSeq"));
+		logger.debug("{}", cont);
+		int postNo = Integer.parseInt(request.getParameter("mPostNo"));
+		logger.debug("pNo - {}", postNo);
+		int seq = Integer.parseInt(request.getParameter("mBoardSeq"));
        logger.debug("seq = {}",seq);
+       
        Post post = new Post();
-       post.setBoardNo(seq);
        post.setBullTitle(title);
        post.setBullCont(cont);
        post.setDelStatus("X");
-       post.setUserId(userVo.getUserId());
+       post.setBullNo(postNo);
        
-       
-      postService.insertPost(post);
-      
-      int postNo = post.getBullNo();
-      logger.debug("postNo - {}", postNo);
+       postService.updatePost(post);
 	
-      Collection<Part> files = request.getParts();
+      List<Part> files = (List<Part>) request.getParts();
       logger.debug("files-size : {}", files.size());
       List<Part> pList = new ArrayList<Part>();
         String fileName = "";
@@ -107,11 +114,11 @@ public class PostFormController extends HttpServlet {
                         attach.setFilePath(path);
                         attach.setBullNo(postNo);
 
-                        postService.insertFile(attach);
+                        int res = postService.insertFile(attach);
+                        logger.debug("수정 성공1111111 - {}", res);
                     }
                 }
             }
-            
          
             
             //postNo , boardNo 를 가지고 redirect를 해준다 postController

@@ -9,6 +9,7 @@
 		<typeAlias alias = "user" type = "kr.or.ddit.user.model.User" />
 		<typeAlias alias = "board" type = "kr.or.ddit.board.model.Board" />
 		<typeAlias alias = "post" type = "kr.or.ddit.post.model.Post" />
+		<typeAlias alias = "attach" type = "kr.or.ddit.post.model.Attach" />
 		<typeAlias alias = "page" type = "kr.or.ddit.common.model.Page" />
 	</typeAliases>
 	

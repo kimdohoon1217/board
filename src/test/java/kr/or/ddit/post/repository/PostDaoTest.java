@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import kr.or.ddit.common.model.Page;
+import kr.or.ddit.post.model.Attach;
 import kr.or.ddit.post.model.Post;
 import kr.or.ddit.user.repository.UserDaoTest;
 import kr.or.ddit.util.MybatisUtil;
@@ -55,7 +56,7 @@ private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
 		List<Post> list = postDao.selectAll(sqlSession);
 		
 		/***Then***/
-		assertEquals(11, list.size());
+		assertEquals(67, list.size());
 		
 	}
 	
@@ -72,7 +73,7 @@ private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
 		//한개의메서드만 실행하고싶으면 클래스위에서 ctrl + F11을 한다
 		/***Given***/
 		Post post = new Post();
-		post.setBoardNo(53);
+		post.setBoardNo(73);
 		post.setBullNo(4);
 		
 		/***When***/
@@ -119,46 +120,130 @@ private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
 	public void getPostTotalCnt() {
 		
 		/***Given***/
-		
+		int seq = 53;
 
 		/***When***/
-		int totalCnt = postDao.getPostTotalCnt(sqlSession);
+		int totalCnt = postDao.getPostTotalCnt(sqlSession, seq);
 
 		/***Then***/
-		assertEquals(11, totalCnt);
+		assertEquals(34, totalCnt);
 		
 	}
 	
-//	/**
-//	 * Method : insertUserTest
-//	 * 작성자 : PC-18
-//	 * 변경이력 :
-//	 * Method 설명 : 사용자 등록 테스트
-//	 * @throws ParseException 
-//	 */
-//	@Test
-//	public void insertUserTest() throws ParseException {
-//		//P_SEQ.nextval, #{boardNo}, #{bullTitle, jdbcType=VARCHAR}, #{bullCont, jdbcType=VARCHAR}, #{userId}, sysdate, #{delStatus}, #{parentNo, jdbcType=VARCHAR}
-//		/***Given***/
-//		Post post = new Post();
-//		post.setBoardNo(53);
-//		post.setBullTitle("연습dsa");
-//		post.setBullCont("연습습dsa");
-//		post.setUserId(userId);
-//		post.setDelStatus("X");
-//		//insert parentNo 고쳐야함
-//		
-//		
-//		
-//		/***When***/
-//		int insertCnt = postDao.insertPost(sqlSession, post);
-//		sqlSession.commit();
-//		
-//		/***Then***/
-//		assertEquals(1, insertCnt);
-//		
-//		
-//	}
+	/**
+	 * Method : getPostLevel
+	 * 작성자 : PC-18
+	 * 변경이력 :
+	 * Method 설명 : level 사이즈
+	 */
+	@Test
+	public void getPostLevel() {
+		
+		/***Given***/
+		
+		/***When***/
+		List<Post> list = postDao.getPostLevel(sqlSession);
+		/***Then***/
+		assertEquals(10, list.size());
+		
+	}
+	
+	
+	/**
+	 * Method : insertUserTest
+	 * 작성자 : PC-18
+	 * 변경이력 :
+	 * Method 설명 : 사용자 등록 테스트
+	 * @throws ParseException 
+	 */
+	@Test
+	public void insertPostTest() {
+		//insert into BULLETIN 
+		//values(P_SEQ.nextval, #{boardNo}, 
+		//#{bullTitle, jdbcType=VARCHAR}, #{bullCont, jdbcType=VARCHAR}, #{userId}, sysdate, #{delStatus}, #{parentNo, jdbcType=VARCHAR}, #{gn, jdbcType=VARCHAR})
+		/***Given***/
+		Post post = new Post();
+		post.setBoardNo(53);
+		post.setBullTitle("연습dsadasdasdasdadsa");
+		post.setBullCont("dsadasdadadadasd");
+		post.setUserId(userId);
+		post.setDelStatus("X");
+		
+		
+		/***When***/
+		int insertCnt = postDao.insertPost(sqlSession, post);
+		sqlSession.commit();
+		
+		/***Then***/
+		assertEquals(1, insertCnt);
+		
+	}
+	
+	@Test
+	public void insertFileTest() {
+		//insert into BULLETIN 
+		//values(P_SEQ.nextval, #{boardNo}, 
+		//#{bullTitle, jdbcType=VARCHAR}, #{bullCont, jdbcType=VARCHAR}, #{userId}, sysdate, #{delStatus}, #{parentNo, jdbcType=VARCHAR}, #{gn, jdbcType=VARCHAR})
+		/***Given***/
+		Attach attach = new Attach();
+		attach.setUploadFile("brown.jpg");
+		attach.setFilePath("sadasdqwdsadwqd");
+		attach.setBullNo(4);
+		
+		/***When***/
+		int insertCnt = postDao.insertFile(sqlSession, attach);
+		sqlSession.commit();
+		
+		/***Then***/
+		assertEquals(1, insertCnt);
+		
+	}
+	
+	
+	@Test
+	public void getFileTest() {
+		/***Given***/
+		int seq = 4;
+		/***When***/
+		List<Attach> fileList = postDao.getFile(sqlSession, seq);
+		/***Then***/
+		assertEquals("brown.jpg", fileList.get(2).getUploadFile());
+		
+	}
+	
+	@Test
+	public void updateDelTest() {
+		
+		/***Given***/
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("bullNo", 55);
+		map.put("delStatus", "Y");
+		
+		/***When***/
+		int res = postDao.updateDel(sqlSession, map);
+		sqlSession.commit();
+
+		/***Then***/
+		assertEquals(1, res);
+		
+	}
+	
+	@Test
+	public void selectCom() {
+		
+		/***Given***/
+		int seq = 85;
+		/***When***/
+		List<Map> list = postDao.selectCom(sqlSession, seq);
+
+		/***Then***/
+		assertEquals(6, list.size());
+	}
+	
+	
+	
+	
+	
 	
 	//수정해야함
 

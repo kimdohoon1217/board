@@ -92,8 +92,10 @@
 	<%@include file="/commonjsp/left.jsp" %>
 </div><div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-				<form action = "${cp}/postForm" id="frm" method="post" enctype="multipart/form-data">
-					<input type="hidden" name = "boardSeq" value="${boardSeq }"/>
+				<form action = "${cp}/reply" id="frm" method="post" enctype="multipart/form-data">
+					<input type="hidden" name = "boardNo" value="${vo.boardNo }"/>
+					<input type="hidden" name = "postNo" value="${vo.bullNo }"/>
+					<input type="hidden" name = "gn" value="${vo.gn }"/>
 					<div class="form-group">
 						<label for="postTitle" class="col-sm-2 control-label">제목</label>
 						<div class="col-sm-8">

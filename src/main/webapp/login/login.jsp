@@ -62,10 +62,10 @@
         <h2 class="form-signin-heading">Login</h2>
         
         <label for="userId" class="sr-only">userId</label>
-        <input type="text" id="userId" name = "userId" class="form-control" placeholder="userId" required autofocus  > <!-- value="brown" -->
+        <input type="text" id="userId" name = "userId" class="form-control" placeholder="userId" required autofocus  value = "cony"> <!-- value="brown" -->
         
         <label for="pass" class="sr-only">Password</label>
-        <input type="password" id="pass" name = "pass" class="form-control" placeholder="Password" required ><!-- value = "brown1234" -->
+        <input type="password" id="pass" name = "pass" class="form-control" placeholder="Password" required value = "cony1234"><!-- value = "brown1234" -->
         
         <button id = "singinBtn" class="btn btn-lg btn-primary btn-block" type="button">Sign in</button>
       </form>
